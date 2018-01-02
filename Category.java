@@ -1,0 +1,112 @@
+/** 
+ * Talon Jin
+ * Mr. Patterson
+ * ICS3U
+ * 1/18/2015
+ *
+ * Displays the Category selection for user to pick questions
+ * 
+ * Pre: Category constructor must have an instance of the Jeopardy created.
+ * Post: Open Question.java.
+ */
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+public class Category extends JFrame {
+ GridLayout topLayout = new GridLayout(1, 1);
+ GridLayout instructionLayout = new GridLayout(1, 1);
+ GridLayout subtopicTopicLayout = new GridLayout(1, 3);
+ GridLayout subtopicQuestionLayout = new GridLayout(3, 3);
+ public static String[] values = { "100", "200", "300" };
+
+ String topic;
+ Player curPlayer;
+ String[] subTopics;
+ String[][] questions;
+ String[][] answers;
+ final int timer;
+ JLabel instruction;
+
+ public Category(String topic, String[] subTopics, String[][] questions, String[][] answers, int timer) {
+  this.topic = topic;
+  this.subTopics = subTopics;
+  this.questions = questions;
+  this.answers = answers;
+  this.timer = timer;
+ }
+
+ // LABEL TO UPDATE TEXT TO CURRENT PLAYER
+ public void updateLabel(String currentPlayer) {
+  instruction.setText(currentPlayer + ": Please select a question.");
+ }
+
+ public void addComponentsToPane(Category category, Jeopardy jeopardy) {
+  Container pane = category.getContentPane();
+  pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
+
+  JPanel topPanel = new JPanel();
+  topPanel.setLayout(topLayout);
+  this.add(topPanel, BorderLayout.CENTER);
+  JLabel title = new JLabel(topic, SwingConstants.CENTER);
+  topPanel.add(title);
+
+  // INSTRUCTION DISPLAY
+  JPanel instructionPanel = new JPanel();
+  instructionPanel.setLayout(instructionLayout);
+  instruction = new JLabel(jeopardy.currentPlayer + ": Please select a question.", SwingConstants.CENTER);
+  instructionPanel.add(instruction);
+
+  // SUBTOPIC LABELS
+  JPanel subtopicTopicPanel = new JPanel();
+  subtopicTopicPanel.setLayout(subtopicTopicLayout);
+  JLabel[] subtopicTopicLabels = new JLabel[3];
+  for (int i = 0; i < 3; i++) {
+   subtopicTopicLabels[i] = new JLabel(subTopics[i], SwingConstants.CENTER);
+   subtopicTopicPanel.add(subtopicTopicLabels[i]);
+  }
+  
+  // BUTTON LAYOUT
+  JPanel subtopicQuestionPanel = new JPanel();
+  subtopicQuestionPanel.setLayout(subtopicQuestionLayout);
+  JButton[][] subtopicQuestionButtons = new JButton[3][3];
+  for (int i = 0; i < 3; i++) {
+   for (int j = 0; j < 3; j++) {
+    subtopicQuestionButtons[i][j] = new JButton(values[i]);
+    subtopicQuestionPanel.add(subtopicQuestionButtons[i][j]);
+   }
+  }
+
+  pane.add(topPanel);
+  pane.add(instructionPanel);
+  pane.add(subtopicTopicPanel);
+  pane.add(subtopicQuestionPanel);
+
+  // COLORS
+  Color blue = new Color(100, 174, 255);
+  topPanel.setBackground(blue);
+  instructionPanel.setBackground(blue);
+  subtopicTopicPanel.setBackground(blue);
+  subtopicQuestionPanel.setBackground(blue);
+
+  for (int i = 0; i < 3; i++) {
+   for (int j = 0; j < 3; j++) {
+    String subtopic = subTopics[j];
+    String subtopicQuestion = questions[j][i];
+    String subtopicAnswer = answers[j][i];
+    int value = Integer.parseInt(values[i]);
+    JButton button = subtopicQuestionButtons[i][j]; // Reversed order to compliment question layout
+    button.addActionListener(new ActionListener() {
+     public void actionPerformed(ActionEvent e) {
+      Question question = new Question(subtopic, subtopicQuestion, subtopicAnswer, value, timer);
+      question.addComponentsToPane(question, jeopardy, category);
+      question.setSize(400, 300);
+      question.setVisible(true);
+      button.setEnabled(false);
+     }
+    });
+   }
+  }
+ }
+}
